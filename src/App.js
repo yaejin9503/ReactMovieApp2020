@@ -1,55 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types'; 
+import axios from 'axios'; 
 
-function Food({name, picture, rating}){
-  return(
-    <div>
-      <h2>I like {name}</h2>
-      <h4>{rating}/5.0</h4>
-      <img src ={picture} alt={name} width="100px" height="100px"/>
-    </div>
-  ); 
-}
+class App extends React.Component {
 
-const foodLike = [
-  {
-    id :1, 
-    name : "김치", 
-    image : "https://post-phinf.pstatic.net/MjAxNzA5MjJfMjEg/MDAxNTA2MDQ4NjA1MTEx.8bp7SLmfXIyMhEp29l0Mai_eXvCBG-kM5eWjGfOp2Wog.fA-Udk9-lGk7JSSKr3rUtkFH2zzLVKxI0f1ENt2_7KYg.JPEG/33_%EC%88%98%ED%8E%99%EC%8A%A4%EB%AA%85%ED%92%88%EA%B9%80%EC%B9%98_v2.jpg?type=w1200", 
-    rating : 5, 
-  }, 
-  {
-    id: 2, 
-    name : "비빔밥", 
-    image : "https://lh3.googleusercontent.com/proxy/DVVP07ojJwlsZRkC_X9VDAntBOkJpliLgokIyeI_QmFy66y7LsINB4F8hNoTtcignMKWy0_weFNPEVGp0KFthz8KTnJOUQKVrbvocmVEdWoYL2T5ZLuL-8FRIYI_aPI",
-    rating : 4.9, 
-  },
-  {
-    id :3, 
-    name : "김밥", 
-    image : "https://homecuisine.co.kr/files/attach/images/140/001/083/558d170258752df2dd76bef00861497f.JPG",
-    rating : 3,
+  state = { //isLoading 상태를 구분 지어 놓기 위해서 지정 
+    isLoading : true,     
+    movies : [], 
+  }; 
+
+  getMovie = async () =>{ //async 자바스크립트에게 getMovie()함수는 시간이 필요하고 ==> 비동기식이다.
+    const { //구조 할당 분배 
+      data : {
+        data : {movies},
+      },
+    } = await axios.get('https://yts.mx/api/v2/list_movies.json?sort_by=rating');
+    //await => axios.get()의 실행을 기다려 달라고 말해주는 것 
+    this.setState({movies, isLoading : false}); //앞은 state 뒤는 구조할당으로 얻은 영화 데이터가 있는 변수 
+    //this..setState({movies: movies}); 이 코드를 위의 코드로 축약 가능
   }
-  
-];
+  componentDidMount(){ //render이 되고 난뒤 실행 되는 생명주기 함수
+    this.getMovie(); 
+  }
 
-/**
- * const renderFood = dish => <Food name={dish.name} picture={dish.image}/>; 
- */
-
-
-function App() {
-  return (
-    <div>
-      {foodLike.map(dish => (<Food key={dish.id} name ={dish.name} picture ={dish.image} rating ={dish.rating}/>))}
-      </div>
-  );
+  render() {
+    const {isLoading} = this.state; 
+    return <div> {isLoading ? 'Loading...' : 'We are ready'}</div>; 
+  }
 }
-
-Food.propTypes = {
-  name : PropTypes.string.isRequired, 
-  image : PropTypes.string.isRequired, 
-  rating : PropTypes.number, 
-};
 
 export default App;
